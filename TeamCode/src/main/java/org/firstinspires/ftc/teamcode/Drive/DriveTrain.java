@@ -168,7 +168,7 @@ public class DriveTrain extends OpMode {
         if (gamepad2.right_bumper) {
             if (timer.seconds() < 0.8) {
                 intake.setClosedState();
-                intakeMotor.moveToPosition(IntakeController.ZERO);
+                intakeMotor.moveToPosition(IntakeController.ZERO); //проверить работает ли
             } else if (timer.seconds() < 1.0) {
                 outtake.dropper.setPosition(Outtake.DROPPER_CLOSE);
             } else if (timer.seconds() < 1.3) {

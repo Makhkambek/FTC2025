@@ -23,7 +23,7 @@ public class MeepMeepTesting {
                 .splineToConstantHeading(new Vector2d(45, -10), Math.toRadians(12))
                                 .strafeTo(new Vector2d(45, -50))
                 .setTangent(Math.toRadians(90)) // Устанавливаем плавный угол входа
-                .splineToConstantHeading(new Vector2d(55, -10), Math.toRadians(35))
+                .splineToConstantHeading(new Vector2d(55, -10), Math.toRadians(30))
                 .strafeTo(new Vector2d(55, -50))
                 .setTangent(Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(61, -10), Math.toRadians(53))
@@ -53,7 +53,6 @@ public class MeepMeepTesting {
 
 
         RoadRunnerBotEntity BlueBasket = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 12)
                 .build();
 
@@ -81,10 +80,6 @@ public class MeepMeepTesting {
                         .waitSeconds(0.5)
                 .splineToLinearHeading(new Pose2d(-25, -10, Math.toRadians(180)), Math.toRadians(0))
                 .build());
-
-
-
-
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)

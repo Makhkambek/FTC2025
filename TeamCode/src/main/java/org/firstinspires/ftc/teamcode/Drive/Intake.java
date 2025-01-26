@@ -75,6 +75,8 @@ public class Intake {
 
     private void executeClosed() {
         if (timer.seconds() < 0.3) {
+            intakeArmLeft.setPosition(INTAKE_ARM_RIGHT_OPEN);
+            intakeArmRight.setPosition(INTAKE_ARM_RIGHT_OPEN);
             intakeGrab.setPosition(INTAKE_GRAB_CLOSED);
         } else if (timer.seconds() < 0.8) {
             intakeArmLeft.setPosition(INTAKE_ARM_LEFT_CLOSED);

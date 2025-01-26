@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.Drive;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Action;
@@ -11,6 +15,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Config
 @Autonomous(name = "BlueAuto", group = "Autonomous")
 public class BlueAuto extends LinearOpMode {
 
@@ -20,6 +25,62 @@ public class BlueAuto extends LinearOpMode {
     private LiftsController liftsController;
     private Outtake outtake;
 
+    Action moveLiftToHighBar = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            liftsController.moveToPosition(LiftsController.HIGH_BAR);
+            return false; // Возвращаем false, чтобы действие завершилось
+        }
+    };
+
+    Action moveLiftToHighBarPut = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            liftsController.moveToPosition(LiftsController.HIGH_BAR_PUT);
+            return false;
+        }
+    };
+
+    Action moveLiftToGround = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            liftsController.moveToPosition(LiftsController.GROUND);
+            return false;
+        }
+    };
+
+    Action setClipsTakeState = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            outtake.setClipsTakeState();
+            return false;
+        }
+    };
+
+    Action setClipsPutState = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            outtake.setClipsPutState();
+            return false;
+        }
+    };
+
+    Action setGrabState = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            outtake.setGrabState();
+            return false;
+        }
+    };
+
+    Action openDropper = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            outtake.dropper.setPosition(Outtake.DROPPER_OPEN);
+            return false;
+        }
+    };
+
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new MecanumDrive(hardwareMap, new Pose2d(10, -65, Math.toRadians(90)));
@@ -27,62 +88,7 @@ public class BlueAuto extends LinearOpMode {
         intakeController = new IntakeController(this);
         liftsController = new LiftsController(this);
         outtake = new Outtake(hardwareMap);
-
-        Action moveLiftToHighBar = new Action() {
-            @Override
-            public boolean run(com.acmerobotics.dashboard.telemetry.TelemetryPacket packet) {
-                liftsController.moveToPosition(LiftsController.HIGH_BAR);
-                return false; // Возвращаем false, чтобы действие завершилось
-            }
-        };
-
-        Action moveLiftToHighBarPut = new Action() {
-            @Override
-            public boolean run(com.acmerobotics.dashboard.telemetry.TelemetryPacket packet) {
-                liftsController.moveToPosition(LiftsController.HIGH_BAR_PUT);
-                return false;
-            }
-        };
-
-        Action moveLiftToGround = new Action() {
-            @Override
-            public boolean run(com.acmerobotics.dashboard.telemetry.TelemetryPacket packet) {
-                liftsController.moveToPosition(LiftsController.GROUND);
-                return false;
-            }
-        };
-
-        Action setClipsTakeState = new Action() {
-            @Override
-            public boolean run(com.acmerobotics.dashboard.telemetry.TelemetryPacket packet) {
-                outtake.setClipsTakeState();
-                return false;
-            }
-        };
-
-        Action setClipsPutState = new Action() {
-            @Override
-            public boolean run(com.acmerobotics.dashboard.telemetry.TelemetryPacket packet) {
-                outtake.setClipsPutState();
-                return false;
-            }
-        };
-
-        Action setGrabState = new Action() {
-            @Override
-            public boolean run(com.acmerobotics.dashboard.telemetry.TelemetryPacket packet) {
-                outtake.setGrabState();
-                return false;
-            }
-        };
-
-        Action openDropper = new Action() {
-            @Override
-            public boolean run(com.acmerobotics.dashboard.telemetry.TelemetryPacket packet) {
-                outtake.dropper.setPosition(Outtake.DROPPER_OPEN);
-                return false;
-            }
-        };
+        
 
         waitForStart();
 
@@ -92,8 +98,10 @@ public class BlueAuto extends LinearOpMode {
                                 drive.actionBuilder(new Pose2d(10, -70, Math.toRadians(90)))
                                         .strafeTo(new Vector2d(10, -35))
                                         .build(),
-                                moveLiftToHighBarPut
+                                moveLiftToHighBarPut,
+                                setClipsPutState
                         ),
+
                         new ParallelAction(
                                 moveLiftToGround,
                                 setClipsTakeState
