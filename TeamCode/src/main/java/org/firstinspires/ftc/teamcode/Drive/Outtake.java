@@ -23,7 +23,7 @@ public class Outtake {
     // Servo objects
     private final Servo armLeft;
     private final Servo armRight;
-    private final Servo claw;
+    public final Servo claw;
     public Servo dropper;
     // FSM States
     private enum State {
@@ -35,7 +35,7 @@ public class Outtake {
     }
 
     private State currentState = State.IDLE;
-    private ElapsedTime timer = new ElapsedTime(); // Timer for sequential actions
+    private ElapsedTime timer = new ElapsedTime();
 
     public Outtake(HardwareMap hardwareMap) {
         armLeft = hardwareMap.get(Servo.class, "arm_left");
@@ -66,7 +66,6 @@ public class Outtake {
         }
     }
 
-    // Sequential Grab Logic
     private void executeGrab() {
         if (timer.seconds() < 0.4) {
             armLeft.setPosition(ARM_LEFT_GRAB);
@@ -80,7 +79,6 @@ public class Outtake {
         }
     }
 
-    // Sequential Score Logic
     private void executeScore() {
         if (timer.seconds() < 0.5) {
             armLeft.setPosition(ARM_LEFT_SCORE);
@@ -93,7 +91,6 @@ public class Outtake {
         }
     }
 
-    // Sequential ClipsTake Logic
     private void executeClipsTake() {
         if (timer.seconds() < 0.5) {
             dropper.setPosition(DROPPER_OPEN);
@@ -107,7 +104,6 @@ public class Outtake {
         }
     }
 
-    // Sequential ClipsPut Logic
     private void executeClipsPut() {
         if (timer.seconds() < 0.3) {
             dropper.setPosition(DROPPER_CLOSE);
@@ -121,7 +117,6 @@ public class Outtake {
         }
     }
 
-    // Methods to set states
     public void setGrabState() {
         currentState = State.GRAB;
         timer.reset();
@@ -142,7 +137,6 @@ public class Outtake {
         timer.reset();
     }
 
-    // Helper methods to set initial positions
     private void setGrabPositions() {
         armLeft.setPosition(ARM_LEFT_GRAB);
         armRight.setPosition(ARM_RIGHT_GRAB);

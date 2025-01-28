@@ -21,18 +21,19 @@ public class Intake {
     public static final double INTAKE_TURN_DEFAULT = 0.5;     // Дефолтная позиция
 
     // Servo objects
-    private final Servo intakeArmLeft;
-    private final Servo intakeArmRight;
-    private final Servo intakeRotate;
-    private final Servo intakeTurn;
+    public final Servo intakeArmLeft;
+    public final Servo intakeArmRight;
+    public final Servo intakeRotate;
+    public final Servo intakeTurn;
     public Servo intakeGrab;
-
+    private Outtake outtake;
     private boolean grabToggled = false;
 
     // FSM States
     private enum State {
         OPEN,
         CLOSED,
+        TRANSFER,
         IDLE
     }
 
@@ -45,6 +46,7 @@ public class Intake {
         intakeRotate = hardwareMap.get(Servo.class, "intake_rotate");
         intakeTurn = hardwareMap.get(Servo.class, "intake_turn");
         intakeGrab = hardwareMap.get(Servo.class, "intake_grab");
+        outtake = new Outtake(hardwareMap);
 
         setClosedPositions(); // Изначально закрыто
     }
@@ -57,6 +59,8 @@ public class Intake {
             case CLOSED:
                 executeClosed();
                 break;
+            case TRANSFER:
+                executeTransfer();
             case IDLE:
                 break;
         }
@@ -78,16 +82,30 @@ public class Intake {
             intakeArmLeft.setPosition(INTAKE_ARM_RIGHT_OPEN);
             intakeArmRight.setPosition(INTAKE_ARM_RIGHT_OPEN);
             intakeGrab.setPosition(INTAKE_GRAB_CLOSED);
-        } else if (timer.seconds() < 0.8) {
+        } else if (timer.seconds() < 0.5) {
             intakeArmLeft.setPosition(INTAKE_ARM_LEFT_CLOSED);
             intakeArmRight.setPosition(INTAKE_ARM_RIGHT_CLOSED);
-            intakeRotate.setPosition(INTAKE_ROTATE_CLOSED);
             intakeTurn.setPosition(INTAKE_TURN_DEFAULT);
         }
         else {
             currentState = State.IDLE;
             timer.reset();
         }
+    }
+
+    private void executeTransfer() {
+        if (timer.seconds() < 0.3) {
+            intakeRotate.setPosition(INTAKE_ROTATE_CLOSED);
+        } else if (timer.seconds() < 0.5) {
+            outtake.dropper.setPosition(Outtake.DROPPER_CLOSE);
+            intakeGrab.setPosition(INTAKE_GRAB_OPEN);
+        }
+    }
+
+
+    public void setTransfer() {
+        currentState = State.TRANSFER;
+        timer.reset();
     }
 
     public void setOpenState() {

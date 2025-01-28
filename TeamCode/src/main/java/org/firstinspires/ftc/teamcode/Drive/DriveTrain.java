@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.Drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
+@TeleOp
 public class DriveTrain extends OpMode {
     private Intake intake;
     private Outtake outtake;
@@ -70,7 +71,7 @@ public class DriveTrain extends OpMode {
         telemetry.addData("HIGH Bar: ", leftBumperToggle);
         telemetry.addData("Intake: ", wasRightBumperPressed);
         telemetry.addData("Intake Position: ", wasRightTriggerPressed);
-        telemetry.addData("Timer", timer.seconds());
+        telemetry.addData("Timer: ", timer.seconds());
         telemetry.update();
     }
 
@@ -102,16 +103,18 @@ public class DriveTrain extends OpMode {
 
 
     private void codeForLift() {
-        // ЛОГИКА ДЛЯ LEFT TRIGGER (Два нажатия)
         if (gamepad2.left_trigger > 0 && !wasLeftTriggerPressed) {
             wasLeftTriggerPressed = true;
             leftTriggerToggle++;
 
             if (leftTriggerToggle > 1) {
-                leftTriggerToggle = 0;  // Обнуляем счётчик после второго нажатия
+                leftTriggerToggle = 0;
             }
 
             if (leftTriggerToggle == 0) {
+                if (timer.seconds() < 0.5) {
+                    intake.setTransfer();
+                }
                 liftMotors.moveToPosition(LiftsController.HIGHEST_BASKET);
             } else if (leftTriggerToggle == 1) {
                 outtake.dropper.setPosition(Outtake.DROPPER_OPEN);
@@ -123,13 +126,12 @@ public class DriveTrain extends OpMode {
             wasLeftTriggerPressed = false;
         }
 
-        // ЛОГИКА ДЛЯ LEFT BUMPER (Три нажатия)
         if (gamepad2.left_bumper && !wasLeftBumperPressed) {
             wasLeftBumperPressed = true;
             leftBumperToggle++;
 
             if (leftBumperToggle > 2) {
-                leftBumperToggle = 0;  // Обнуляем счётчик после третьего нажатия
+                leftBumperToggle = 0;
             }
 
             if (leftBumperToggle == 0) {
@@ -162,13 +164,15 @@ public class DriveTrain extends OpMode {
             wasRightTriggerPressed = true;
 
             if (gamepad2.right_trigger <= 0.5) {
-                intakeMotor.moveToPosition(IntakeController.MEDIUM);
-            } else {
+                    intakeMotor.moveToPosition(IntakeController.MEDIUM);
+            } else if (gamepad2.right_trigger > 0.6){
                 intakeMotor.moveToPosition(IntakeController.LONG);
             }
+
             intake.setOpenState();
             outtake.setGrabState();
         }
+
         if (gamepad2.right_trigger == 0) {
             wasRightTriggerPressed = false;
         }
@@ -179,21 +183,17 @@ public class DriveTrain extends OpMode {
             timer.reset();
         }
         if (wasRightBumperPressed) {
-            double timeElapsed = timer.seconds(); // Запоминаем время один раз
+            double timeElapsed = timer.seconds();
 
-            if (timeElapsed < 0.8) {
+            if (timeElapsed < 0.5) {
                 intake.setClosedState();
+            } else if (timeElapsed < 0.9) {
                 intakeMotor.moveToPosition(IntakeController.ZERO);
-            } else if (timeElapsed < 1.0) {
-                outtake.dropper.setPosition(Outtake.DROPPER_CLOSE);
-            } else if (timeElapsed < 1.3) {
-                intake.intakeGrab.setPosition(Intake.INTAKE_GRAB_OPEN);
-            } else if (timeElapsed < 1.8) {
-                outtake.setScoreState();
             } else {
                 wasRightBumperPressed = false;
             }
         }
+
 
         if (gamepad2.dpad_left) {
             intake.setTurnPosition1();
@@ -201,6 +201,8 @@ public class DriveTrain extends OpMode {
             intake.setTurnPosition2();
         } else if (gamepad1.right_bumper) {
             outtake.dropper.setPosition(Outtake.DROPPER_OPEN);
+        } else if (gamepad2.dpad_up) {
+            intake.setTurnDefault();
         }
 
         intake.update();
