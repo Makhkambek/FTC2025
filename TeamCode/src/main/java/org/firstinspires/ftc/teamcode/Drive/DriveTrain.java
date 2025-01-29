@@ -159,13 +159,12 @@ public class DriveTrain extends OpMode {
 
 
     private void codeForIntake() {
-
         if (gamepad2.right_trigger > 0 && !wasRightTriggerPressed) {
             wasRightTriggerPressed = true;
 
             if (gamepad2.right_trigger <= 0.5) {
-                    intakeMotor.moveToPosition(IntakeController.MEDIUM);
-            } else if (gamepad2.right_trigger > 0.6){
+                intakeMotor.moveToPosition(IntakeController.MEDIUM);
+            } else if (gamepad2.right_trigger > 0.6) {
                 intakeMotor.moveToPosition(IntakeController.LONG);
             }
 
@@ -176,7 +175,6 @@ public class DriveTrain extends OpMode {
         if (gamepad2.right_trigger == 0) {
             wasRightTriggerPressed = false;
         }
-
 
         if (gamepad2.right_bumper && !wasRightBumperPressed) {
             wasRightBumperPressed = true;
@@ -194,14 +192,13 @@ public class DriveTrain extends OpMode {
             }
         }
 
+        double stickX = gamepad2.right_stick_x;
 
-        if (gamepad2.dpad_left) {
+        if (stickX > 0.5) {
             intake.setTurnPosition1();
-        } else if (gamepad2.dpad_right) {
+        } else if (stickX < -0.5) {
             intake.setTurnPosition2();
-        } else if (gamepad1.right_bumper) {
-            outtake.dropper.setPosition(Outtake.DROPPER_OPEN);
-        } else if (gamepad2.dpad_up) {
+        } else {
             intake.setTurnDefault();
         }
 
